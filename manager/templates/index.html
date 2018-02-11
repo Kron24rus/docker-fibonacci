@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Docker Lab</title>
+</head>
+<link rel="stylesheet" href="http://bootstrap-3.ru/dist/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+    var workerURL = window.location.protocol + "//" + window.location.hostname + ":{{port}}";
+
+    function enable(node) {
+        return node.attr("disabled", false)
+            .text(node.data("text"));
+    }
+
+    function disable(node) {
+        return node.attr("disabled", true)
+            .data("text", node.text())
+            .text("...");
+    }
+
+    function update() {
+        $button = disable($("#update"));
+        $.ajax({
+            type: "GET",
+            url: "/data"
+        })
+        .then((data) => {
+        	$("#index").text(data.index)
+        	$("#number").text(data.result)
+        })
+        .always(() => enable($button));
+    }
+
+    function raise() {
+        $button = disable($("#raise"));
+        $.ajax({
+            type: "POST",
+            url: workerURL + "/raise"
+        })
+        .always(() => enable($button));
+    }
+
+    $(document).ready(function() {
+        update();
+        $("#update").click(update);
+        $("#raise").click(raise);
+    });
+</script>
+<body>
+    <div class="container">
+        <h1>Fibonacci number counter</h1>
+        <p>
+            <a class="btn btn-primary btn-lg" role="button" id="update">Update</a>
+            <a class="btn btn-success btn-lg" role="button" id="raise">Raise</a>
+        </p>
+        <h1 id="number"></h1>
+        <p>Index: <span id="index"></span></p>
+    </div>
+</body>
+</html>
